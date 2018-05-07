@@ -17,7 +17,9 @@ Page({
     movelength: 0,  // 上移或下拉动画的单位距离
     cartIsHidden: true, // 购物车是否隐藏
     cartIndexIsHidden: true, // 购物车详情菜单是否隐藏 
-    animationData: {} // 动画动作对象
+    animationData: {}, // 动画动作对象
+    showCar: false,
+    
   },
   // 设置标题名
   onReady: function () {
@@ -135,6 +137,11 @@ Page({
       cartIndexIsHidden: cart_indexIsHidden,
       animationData: animation.export()
     })
+
+    let showCar = this.data.showCar
+    this.setData({
+      showCar: !showCar
+    })
   },
   // 购物车详情抽屉中增加数量
   addShopcartInCart: function (e) {
@@ -214,8 +221,65 @@ Page({
       key: "OrderMenu",
       data: OrderMenu
     });
+
+    // 提交订单
     wx.navigateTo({
       url: '../order/order'
     })
-  }
+  },
+  // 显示隐藏购物车列表
+  showCartList: function (e) {
+    console.log(this.data.showCar, this.data.shoppingList)
+    if (this.data.shoppingList.length != 0) {
+      this.setData({
+        showCar: !this.data.showCar,
+      });
+    }
+  },
+  clearCartList: function () {
+    this.setData({
+      shoppingList: [],
+      showCar: false,
+      totalPrice: 0,
+      totalCount: 0,
+    })
+  },
+  addNumber: function (e) {
+    var index = e.currentTarget.dataset.index;
+    console.log(index)
+    var shoppingList = this.data.shoppingList;
+    shoppingList[index].num++;
+    var total = this.data.totalPrice + parseInt(shoppingList[index].price);
+    shoppingList[index].total += parseInt(shoppingList[index].price);
+    console.log(typeof total,typeof this.data.totalPrice, typeof shoppingList[index].total, typeof shoppingList[index].price)
+
+    console.log(this.data.totalPrice, this.data.totalCount)
+
+    this.setData({
+      shoppingList: shoppingList,
+      totalPrice: total,
+      totalCount: this.data.totalCount + 1
+    })
+  },
+  // totalPrice totalCount
+  decNumber: function (e) {
+    var index = e.currentTarget.dataset.index;
+    console.log(index)
+    var shoppingList = this.data.shoppingList;
+
+    var total = this.data.totalPrice - parseInt(shoppingList[index].price);
+    shoppingList[index].total -= parseInt(shoppingList[index].price);
+    shoppingList[index].num == 1 ? shoppingList.splice(index, 1) : shoppingList[index].num--;
+
+    console.log(typeof total, typeof shoppingList[index].total, typeof shoppingList[index].price)
+
+    console.log(this.data.totalPrice, this.data.totalCount)
+    
+    this.setData({
+      shoppingList: shoppingList,
+      totalPrice: total,
+      showCar: shoppingList.length == 0 ? false : true,
+      totalCount: this.data.totalCount - 1
+    });
+  },
 })
