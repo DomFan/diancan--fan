@@ -88,6 +88,12 @@ view {
 .food-left {
 }
 .food-right {
+  width: 280rpx;
+}
+.food__num {
+  width: 32rpx;
+  font-size: 34rpx;
+  text-align: center;
 }
 .food-img {
   width: 150rpx;
@@ -101,13 +107,17 @@ view {
   margin-top: 10rpx;
 }
 .food__price {
-  font-size: 50rpx;
+  font-size: 36rpx;
   color: #e02d3f;
   font-weight: 600;
 }
+.totalInput {
+  width: 360rpx;
+  height: 90rpx;
+}
 .countNum {
   float: right; 
-  margin-right: 20rpx;
+  margin-right: 10rpx;
   margin-top: 74rpx;
   overflow: hidden;
 }

@@ -12,7 +12,7 @@
   <scroll-view class="main-page" style="height:100%;" scroll-y="true" scroll-into-view="{{scroll_into_view}}">
     <view class="food-list" wx:for="{{foodArray}}" wx:for-item="item" wx:key='index' id="foodtype{{index}}">
       <view class="food__title">{{item.title}}</view>
-      <view class="food-item" wx:for="{{item.foodsIndex}}" wx:for-item="food" wx:for-index="foodidx" wx:key='index' id="food{{index}}">
+      <view class="food-item" wx:for="{{item.foodsIndex}}" wx:for-item="food" wx:for-index="foodindex" wx:key='index' id="food{{index}}">
         <view class='food-left'>
           <image class="food-img" src='{{food.url}}'></image>
         </view>
@@ -21,9 +21,10 @@
           <view class="food__price">{{food.price}}¥</view>
         </view>
         <view class='countNum'>
-          <view class="food__add" data-foodidx="{{index}}{{foodidx}}" data-price="{{food.price}}" data-name="{{food.name}}" catchtap="addShopcart">+</view>
-          <view class='food__num'>0</view>
-          <view class="food__sub" data-foodidx="{{index}}{{foodidx}}" data-price="{{food.price}}" data-name="{{food.name}}" catchtap="subShopcart">-</view>
+          <view class="food__add" data-foodidx="{{index}}{{foodindex}}" data-price="{{food.price}}" data-name="{{food.name}}" catchtap="addShopcart">+</view>
+          <!-- <view class='food__num'>{{countObj[foodidx]}}</view> -->
+          <view wx:if='{{food.num > 0}}' class='food__num'>{{food.num}}</view>
+          <view wx:if='{{food.num > 0}}' class="food__sub" data-foodidx="{{index}}{{foodindex}}" data-price="{{food.price}}" data-name="{{food.name}}" catchtap="subShopcart">-</view>
         </view>
         
       </view>
@@ -38,8 +39,10 @@
         <view class="shopcart__count">{{totalCount}}</view>
       </view>
       <view class="shopcart-middle">
-        <view class="shopcart__price">¥
-          <text>{{totalPrice}}</text>
+        <view class="shopcart__price">
+          <!-- <text>{{totalPrice}}</text> -->
+          <input wx:if='{{shoppingList.length > 0}}' class='totalInput' value='￥ {{totalPrice}}' disabled maxlength='10'></input>
+          <input wx:if='{{shoppingList.length == 0}}' class='totalInput' value='暂无商品' disabled></input>
         </view>
       </view>
       <view class="shopcart-right" catchtap="toCount">
@@ -72,7 +75,7 @@
       <view style='width:50%;padding:10px;'>
         <view style='float:right'>
           <!-- <label class='activity-color'>¥ {{item.sum}}.00</label> -->
-          <label class='activity-color'>¥ {{item.price}}</label>
+          <label class='activity-color'>¥ {{item.total}}</label>
           <i class="iconfont icon-jian icon-li-circle" data-index="{{index}}" bindtap="decNumber"></i>
           {{item.num}}
           <i class="iconfont icon-jiahao2fill activity-color font20" data-index="{{index}}" bindtap="addNumber"></i>

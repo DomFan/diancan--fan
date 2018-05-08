@@ -19,42 +19,11 @@ Page({
     cartIndexIsHidden: true, // 购物车详情菜单是否隐藏 
     animationData: {}, // 动画动作对象
     showCar: false,
-    
+    countObj: {}, // 计数对象
+    // foodidx: 0,
+
   },
-  // 设置标题名
-  onReady: function () {
-    wx.setNavigationBarTitle({
-      title: '菜单'
-    })
-  },
-  // 加载ajax的最佳时机
-  onLoad: function (options) {
-    let that = this
-    wx.showToast({
-      title: '加载中',
-      icon: 'loading',
-      duration: 0,
-      mask: true
-    })
-    // 发送请求
-    wx.request({
-      url: 'http://easy-mock.com/mock/5905d4597a878d73716e2c6b/kfc/kfc',
-      method: 'GET',
-      data: {},
-      header: {
-        'Accept': 'application/json'
-      },
-      success: function (res) {
-        console.log(res.data)
-        that.setData({
-          imgArray: res.data.navArray,
-          foodArray: res.data.foodArray
-        })
-      }
-    }, function () {
-      wx.hideToast();
-    })
-  },
+
   // 跳页的id
   changepage: function (e) {
     // 滚动到指定的id
@@ -65,28 +34,68 @@ Page({
   },
   // 点击‘+’添加进购物车
   addShopcart: function (e) {
+    let foodArray = this.data.foodArray
+    let foodName = e.target.dataset.name
+    let foodidx = e.target.dataset.foodidx
+    let countObj = this.data.countObj
     let move_length = this.data.movelength;
     let shopping_list = this.data.shoppingList;
     let total_price = this.data.totalPrice;
     let total_count = this.data.totalCount + 1;
-    total_price = parseInt(total_price) + parseInt(e.target.dataset.price);
+    total_price = parseFloat(total_price) + parseFloat(e.target.dataset.price);
     let itemNum = 1;
     let that = this;
 
-    console.log('shopList', this.data.shoppingList, e.target.dataset)
+    // 创建一空对象 保存点击加号的商品序号 及对应计数
+    // console.log(foodidx)
+    !countObj[foodidx] ? countObj[foodidx] = 0 : ''
+    countObj[foodidx]++
+    this.setData({ countObj })
+    this.setData({ foodidx: foodidx})
+    // console.log(countObj, countObj[foodidx])
+    // !countObj[foodidx][num] ? countObj[foodidx].num = 0 : ''
+
+    // 改变整个foodArray数组 添加num计数
+    for (var i = 0; i < foodArray.length; i++) {
+      for (var j = 0; j < foodArray[i].foodsIndex.length; j++) {
+        if (foodArray[i].foodsIndex[j].name == foodName) {
+          if (!foodArray[i].foodsIndex[j].num) {
+            foodArray[i].foodsIndex[j].num = 1
+            // console.log(foodArray[i].foodsIndex[j], foodArray[i].foodsIndex[j].num)
+          } else {
+            foodArray[i].foodsIndex[j].num++            
+          }
+          that.setData({foodArray})
+        }
+      }
+    }
+
+    // foodArray.map(item => {
+    //   item.foodsIndex.map(food => {
+    //     !food.num ? food.num = 0 : ''
+    //     // food.name == foodName ? food.num++ : ''
+    //     if (food.name == foodName) {
+    //       food.num++
+    //       console.log(food)
+    //     }
+    //   })
+    // })
+
+    // console.log('shopList', this.data.shoppingList, e.target.dataset)
 
     // 是否有同种商品判断
     if (this.data.shoppingList.length > 0) {
       // 商品名是否相同判断，不重复添加同名商品
-      let isHave = this.data.shoppingList.findIndex(item => item.name == e.target.dataset.name)
+      let isHave = this.data.shoppingList.findIndex(item => item.name == foodName)
       if (isHave != -1) {
         that.data.shoppingList[isHave].num++
       } else {
         // 购物车数组加进新的一样食品
         that.data.shoppingList.push({
-          price: e.target.dataset.price,
+          price: parseFloat(e.target.dataset.price),
           name: e.target.dataset.name,
-          num: itemNum
+          num: itemNum,
+          total: parseFloat(e.target.dataset.price)
         })
         // 动画效果的长度添加
         move_length++
@@ -94,9 +103,10 @@ Page({
       // 没有商品时直接添加
     } else {
       this.data.shoppingList.push({
-        price: e.target.dataset.price,
+        price: parseFloat(e.target.dataset.price),
         name: e.target.dataset.name,
-        num: itemNum
+        num: itemNum,
+        total: parseFloat(e.target.dataset.price)
       })
       move_length++
     }
@@ -122,6 +132,8 @@ Page({
       cartIsHidden: false,
       movelength: move_length
     })
+
+    console.log(this.data.totalPrice)
   },
   // 购物车详情抽屉点击时弹出
   showCart: function (e) {
@@ -207,6 +219,8 @@ Page({
       totalPrice: tempPrice,
       totalCount: total_count
     })
+
+    console.log(this.data.totalPrice)
   },
   toCount: function (e) {
     console.log(this.data.totalCount)
@@ -249,17 +263,22 @@ Page({
     console.log(index)
     var shoppingList = this.data.shoppingList;
     shoppingList[index].num++;
-    var total = this.data.totalPrice + parseInt(shoppingList[index].price);
-    shoppingList[index].total += parseInt(shoppingList[index].price);
-    console.log(typeof total,typeof this.data.totalPrice, typeof shoppingList[index].total, typeof shoppingList[index].price)
+    var total = this.data.totalPrice + (shoppingList[index].price);
+    total = parseFloat(total.toFixed(2))
+    shoppingList[index].total += (shoppingList[index].price);
+    // 保留两位小数
+    shoppingList[index].total = parseFloat(shoppingList[index].total.toFixed(2))
 
-    console.log(this.data.totalPrice, this.data.totalCount)
+    console.log(shoppingList[index].num, shoppingList)
+    
+    // console.log(typeof total,typeof this.data.totalPrice, typeof shoppingList[index].total, typeof shoppingList[index].price)
 
     this.setData({
       shoppingList: shoppingList,
       totalPrice: total,
       totalCount: this.data.totalCount + 1
     })
+    console.log(this.data.totalPrice, this.data.totalCount)
   },
   // totalPrice totalCount
   decNumber: function (e) {
@@ -267,19 +286,106 @@ Page({
     console.log(index)
     var shoppingList = this.data.shoppingList;
 
-    var total = this.data.totalPrice - parseInt(shoppingList[index].price);
-    shoppingList[index].total -= parseInt(shoppingList[index].price);
+    var total = this.data.totalPrice - (shoppingList[index].price);
+    // shoppingList[index].total = parseFloat(shoppingList[index].total) - parseFloat(shoppingList[index].price);
+    shoppingList[index].total -= shoppingList[index].price;
     shoppingList[index].num == 1 ? shoppingList.splice(index, 1) : shoppingList[index].num--;
-
-    console.log(typeof total, typeof shoppingList[index].total, typeof shoppingList[index].price)
-
-    console.log(this.data.totalPrice, this.data.totalCount)
-    
+    // if (shoppingList[index].num == 1) {
+    //   console.log(shoppingList)    
+    //   // debugger  
+    //   shoppingList.splice(index, 1)
+    // } else {
+    //   console.log(shoppingList)
+    //   shoppingList[index].num--
+    // }
     this.setData({
       shoppingList: shoppingList,
       totalPrice: total,
       showCar: shoppingList.length == 0 ? false : true,
       totalCount: this.data.totalCount - 1
     });
+    console.log(this.data.totalPrice, this.data.totalCount)
+  },
+
+  /**
+   * 生命周期函数--监听页面初次渲染完成
+   */
+  onReady: function () {
+    // 设置标题名
+    // wx.setNavigationBarTitle({
+    //   title: '菜单'
+    // })
+  },
+  /**
+   * 生命周期函数--监听页面加载
+   */
+  // 加载ajax的最佳时机
+  onLoad: function (options) {
+    let that = this
+    wx.showToast({
+      title: '加载中',
+      icon: 'loading',
+      duration: 0,
+      mask: true
+    })
+    // 发送请求
+    wx.request({
+      url: 'http://easy-mock.com/mock/5905d4597a878d73716e2c6b/kfc/kfc',
+      method: 'GET',
+      data: {},
+      header: {
+        'Accept': 'application/json'
+      },
+      success: function (res) {
+        console.log(res.data)
+        that.setData({
+          imgArray: res.data.navArray,
+          foodArray: res.data.foodArray
+        })
+      }
+    }, function () {
+      wx.hideToast();
+    })
+  },
+  /**
+   * 生命周期函数--监听页面显示
+   */
+  onShow: function () {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面隐藏
+   */
+  onHide: function () {
+
+  },
+
+  /**
+   * 生命周期函数--监听页面卸载
+   */
+  onUnload: function () {
+
+  },
+
+  /**
+   * 页面相关事件处理函数--监听用户下拉动作
+   */
+  onPullDownRefresh: function () {
+
+  },
+
+  /**
+   * 页面上拉触底事件的处理函数
+   */
+  onReachBottom: function () {
+
+  },
+
+  /**
+   * 用户点击右上角分享
+   */
+  onShareAppMessage: function () {
+
   },
 })
