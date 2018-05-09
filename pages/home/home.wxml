@@ -18,13 +18,12 @@
         </view>
         <view class="food-right">
           <view class="food__name">{{food.name}}</view>
-          <view class="food__price">{{food.price}}¥</view>
+          <view class="food__price">￥ {{food.price}}</view>
         </view>
         <view class='countNum'>
-          <view class="food__add" data-foodidx="{{index}}{{foodindex}}" data-price="{{food.price}}" data-name="{{food.name}}" catchtap="addShopcart">+</view>
-          <!-- <view class='food__num'>{{countObj[foodidx]}}</view> -->
+          <i class="addIcon iconfont icon-jiahao2fill activity-color font20" data-foodidx="{{index}}{{foodindex}}" data-price="{{food.price}}" data-name="{{food.name}}" catchtap="addShopcart"></i>
           <view wx:if='{{food.num > 0}}' class='food__num'>{{food.num}}</view>
-          <view wx:if='{{food.num > 0}}' class="food__sub" data-foodidx="{{index}}{{foodindex}}" data-price="{{food.price}}" data-name="{{food.name}}" catchtap="subShopcart">-</view>
+          <i wx:if='{{food.num > 0}}' class="subIcon iconfont icon-jian" data-foodidx="{{index}}{{foodindex}}" data-price="{{food.price}}" data-name="{{food.name}}" bindtap="subShopcart"></i>
         </view>
         
       </view>
@@ -32,7 +31,7 @@
   </scroll-view>
 
   <!--购物车导航  -->
-  <view class="shopcart" bindtap="showCart" hidden="{{cartIsHidden}}">
+  <view class="shopcart {{totalCount==0 ? 'bg-gray' : ''}}" bindtap="showCart" hidden="{{cartIsHidden}}">
     <view class="shopcart-main">
       <view class="shopcart-left">
         <image src="../../image/car_s.png" class="shopcart__icon"></image>
@@ -56,7 +55,7 @@
   <!--遮罩层  -->
 <view class='mask' bindtap="showCartList" data-statu="close" wx:if='{{showCar}}'></view>
 <view class='cartlist-float' wx:if='{{showCar}}'>
-  <view style='background:#F0F0F0;height:30px'>
+  <view class='carlist-title'>
     <label class='label-cart-bar'>
       <label style='padding:5px'>已选商品</label>
     </label>
@@ -70,36 +69,16 @@
     <view class='cart-list-box' wx:for="{{shoppingList}}" wx:key="unique" style='border-bottom:1px #E3E3E3 solid'>
       <view class='list-info'>
         <view>{{item.name}}</view>
-        <!-- <view class='list-info-size'>{{item.detail}}</view> -->
+        <!-- <view class='list-info-size'>{{item.detail}}</view>  -->
       </view>
-      <view style='width:50%;padding:10px;'>
+      <view class='list-count'>
         <view style='float:right'>
-          <!-- <label class='activity-color'>¥ {{item.sum}}.00</label> -->
-          <label class='activity-color'>¥ {{item.total}}</label>
-          <i class="iconfont icon-jian icon-li-circle" data-index="{{index}}" bindtap="decNumber"></i>
-          {{item.num}}
-          <i class="iconfont icon-jiahao2fill activity-color font20" data-index="{{index}}" bindtap="addNumber"></i>
+          <label class='activity-color'>￥{{item.total}}</label>
+          <i class="iconfont icon-jian icon-li-circle ver-mid" data-name="{{item.name}}" data-index="{{index}}" bindtap="decNumber"></i>
+          <view class='text-num ver-mid'>{{item.num}}</view>
+          <i class="iconfont icon-jiahao2fill activity-color font20 ver-mid" data-name="{{item.name}}" data-index="{{index}}" bindtap="addNumber"></i>
         </view>
       </view>
     </view>
   </scroll-view>
 </view>
-
-
-<!-- <view class="list-mask" hidden="{{cartIndexIsHidden}}" animation="{{animationData}}">
-  <scroll-view scroll-y="true" class="{{shoppingList.length>5?'cart-scroll-list':''}}">
-  <view hidden="{{cartIndexIsHidden}}" class="shopcart__items" wx:for="{{shoppingList}}" wx:for-item="item" wx:key='index'>
-    <view class="shopcart__item" hidden="{{cartIndexIsHidden}}">
-      <view class="cart__left">
-        <view class="item__h3">{{item.name}}</view>
-        <view class="item__price">¥{{item.price}}</view>
-      </view>
-      <view class="cart__right">
-        <view class="food__add food__add--delete" data-foodidx="{{index}}" data-price="{{item.price}}" data-name="{{item.name}}" catchtap="deleteShopcartInCart">-</view>
-        <text>{{item.num}}</text>
-        <view class="food__add" data-foodidx="{{index}}" data-price="{{item.price}}" data-name="{{item.name}}" catchtap="addShopcartInCart">+</view>
-      </view>
-    </view>
-  </view>
-  </scroll-view>
-</view>  -->

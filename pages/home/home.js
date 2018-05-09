@@ -18,13 +18,13 @@ Page({
     cartIsHidden: true, // 购物车是否隐藏
     cartIndexIsHidden: true, // 购物车详情菜单是否隐藏 
     animationData: {}, // 动画动作对象
-    showCar: false,
+    showCar: false, // 是否显示购物车列表
     countObj: {}, // 计数对象
     // foodidx: 0,
 
   },
 
-  // 跳页的id
+  // 跳页的id 左侧导航与主体联动
   changepage: function (e) {
     // 滚动到指定的id
     let goPage = e.currentTarget.id
@@ -34,10 +34,6 @@ Page({
   },
   // 点击‘+’添加进购物车
   addShopcart: function (e) {
-    let foodArray = this.data.foodArray
-    let foodName = e.target.dataset.name
-    let foodidx = e.target.dataset.foodidx
-    let countObj = this.data.countObj
     let move_length = this.data.movelength;
     let shopping_list = this.data.shoppingList;
     let total_price = this.data.totalPrice;
@@ -45,42 +41,41 @@ Page({
     total_price = parseFloat(total_price) + parseFloat(e.target.dataset.price);
     let itemNum = 1;
     let that = this;
+    let total
 
-    // 创建一空对象 保存点击加号的商品序号 及对应计数
+    // 创建一空对象 保存点击加号的商品序号 及对应计数 没达到预期效果
+    // let foodidx = e.target.dataset.foodidx
+    // let countObj = this.data.countObj
     // console.log(foodidx)
-    !countObj[foodidx] ? countObj[foodidx] = 0 : ''
-    countObj[foodidx]++
-    this.setData({ countObj })
-    this.setData({ foodidx: foodidx})
-    // console.log(countObj, countObj[foodidx])
-    // !countObj[foodidx][num] ? countObj[foodidx].num = 0 : ''
+    // !countObj[foodidx] ? countObj[foodidx] = 0 : ''
+    // countObj[foodidx]++
+    // this.setData({ countObj })
+    // this.setData({ foodidx: foodidx})
 
     // 改变整个foodArray数组 添加num计数
-    for (var i = 0; i < foodArray.length; i++) {
-      for (var j = 0; j < foodArray[i].foodsIndex.length; j++) {
-        if (foodArray[i].foodsIndex[j].name == foodName) {
-          if (!foodArray[i].foodsIndex[j].num) {
-            foodArray[i].foodsIndex[j].num = 1
-            // console.log(foodArray[i].foodsIndex[j], foodArray[i].foodsIndex[j].num)
-          } else {
-            foodArray[i].foodsIndex[j].num++            
-          }
+    let foodArray = this.data.foodArray
+    let foodName = e.target.dataset.name
+    foodArray.map(item =>{
+      item.foodsIndex.map(food =>{
+        if (food.name == foodName) {
+          !food.num ? food.num = 1 : food.num++
           that.setData({foodArray})
         }
-      }
-    }
-
-    // foodArray.map(item => {
-    //   item.foodsIndex.map(food => {
-    //     !food.num ? food.num = 0 : ''
-    //     // food.name == foodName ? food.num++ : ''
-    //     if (food.name == foodName) {
-    //       food.num++
-    //       console.log(food)
+      })
+    })
+    // for (var i = 0; i < foodArray.length; i++) {
+    //   for (var j = 0; j < foodArray[i].foodsIndex.length; j++) {
+    //     if (foodArray[i].foodsIndex[j].name == foodName) {
+    //       if (!foodArray[i].foodsIndex[j].num) {
+    //         foodArray[i].foodsIndex[j].num = 1
+    //         // console.log(foodArray[i].foodsIndex[j], foodArray[i].foodsIndex[j].num)
+    //       } else {
+    //         foodArray[i].foodsIndex[j].num++            
+    //       }
+    //       that.setData({foodArray})
     //     }
-    //   })
-    // })
-
+    //   }
+    // }
     // console.log('shopList', this.data.shoppingList, e.target.dataset)
 
     // 是否有同种商品判断
@@ -89,6 +84,8 @@ Page({
       let isHave = this.data.shoppingList.findIndex(item => item.name == foodName)
       if (isHave != -1) {
         that.data.shoppingList[isHave].num++
+        total = that.data.shoppingList[isHave].num*that.data.shoppingList[isHave].price
+        that.data.shoppingList[isHave].total = total
       } else {
         // 购物车数组加进新的一样食品
         that.data.shoppingList.push({
@@ -135,6 +132,62 @@ Page({
 
     console.log(this.data.totalPrice)
   },
+  // 点击‘-’删除指定商品
+  subShopcart: function (e) {
+    let that = this,
+        total_count = this.data.totalCount,
+        total_price = this.data.totalPrice,
+        shoppingList = this.data.shoppingList,
+        foodArray = this.data.foodArray,
+        itemNum = 1
+    // 点击的商品信息
+    let foodPrice = e.target.dataset.price,
+        foodName = e.target.dataset.name
+    // 计算总价
+    total_price = parseFloat(total_price) - parseFloat(foodPrice);
+    // 修改主体中商品数量
+    foodArray.map(item => {
+      item.foodsIndex.map(food => {
+        food.name == foodName ? food.num-- : ''
+      })
+    })
+    that.setData({ foodArray })
+    // 修改购物车列表中物品数量及价格
+    let itemIndex = shoppingList.findIndex(item => item.name == foodName)
+    let item = shoppingList[itemIndex]
+    if (item.num == 1) {
+      console.log(1)
+      shoppingList.splice(itemIndex, 1)
+    } else {
+      item.num-= 1
+      item.total -=item.price
+    }
+    // shoppingList.map(item => {
+    //   if (item.name == foodName) {
+    //     if (item.num == 0) {
+    //       shoppingList.splice(itemIndex, 1)
+    //     } else {
+    //       item.num-= 1
+    //       item.total-= item.price
+    //     }
+    //   }
+    // })
+    // console.log(shoppingList)
+    this.setData({
+      shoppingList: shoppingList,
+      totalPrice: total_price,
+      totalCount: total_count - 1
+    });
+
+    // 隐藏购物车导航
+    let cartIsHidden = this.data.cartIsHidden,
+        count = this.data.totalCount
+    if (count == 0) {
+      this.setData({
+        cartIsHidden: true
+      })
+    }
+  },
   // 购物车详情抽屉点击时弹出
   showCart: function (e) {
     let move_length = 0;
@@ -150,7 +203,14 @@ Page({
       animationData: animation.export()
     })
 
-    let showCar = this.data.showCar
+    let showCar = this.data.showCar,
+        count = this.data.totalCount
+    // 如果购物车列表为空 购物车导航不可点击
+    if (count == 0) {
+      this.setData({ showCar: false})
+      return false
+    }
+
     this.setData({
       showCar: !showCar
     })
@@ -222,7 +282,10 @@ Page({
 
     console.log(this.data.totalPrice)
   },
+  // 选好了 去结算
   toCount: function (e) {
+    let count = this.data.totalCount
+    if (count == 0) { return }
     console.log(this.data.totalCount)
     // 菜单对象
     let OrderMenu = {
@@ -250,7 +313,15 @@ Page({
       });
     }
   },
+  // 清空购物车列表
   clearCartList: function () {
+    let foodArray = this.data.foodArray
+    foodArray.map(item => {
+      item.foodsIndex.map(food => { 
+        food.num ? food.num = 0 : ''
+      })
+    })
+        this.setData({ foodArray })
     this.setData({
       shoppingList: [],
       showCar: false,
@@ -258,6 +329,7 @@ Page({
       totalCount: 0,
     })
   },
+  // 购物车 +
   addNumber: function (e) {
     var index = e.currentTarget.dataset.index;
     console.log(index)
@@ -270,8 +342,19 @@ Page({
     shoppingList[index].total = parseFloat(shoppingList[index].total.toFixed(2))
 
     console.log(shoppingList[index].num, shoppingList)
-    
     // console.log(typeof total,typeof this.data.totalPrice, typeof shoppingList[index].total, typeof shoppingList[index].price)
+
+    let that = this,
+        foodArray = this.data.foodArray,
+        foodName = e.target.dataset.name
+    foodArray.map(item => {
+      item.foodsIndex.map(food => {
+        if (food.name == foodName) {
+          !food.num ? food.num = 1 : food.num++
+          that.setData({ foodArray })
+        }
+      })
+    })
 
     this.setData({
       shoppingList: shoppingList,
@@ -280,31 +363,46 @@ Page({
     })
     console.log(this.data.totalPrice, this.data.totalCount)
   },
-  // totalPrice totalCount
+  // 购物车 -
   decNumber: function (e) {
     var index = e.currentTarget.dataset.index;
-    console.log(index)
+    // console.log(index)
     var shoppingList = this.data.shoppingList;
 
     var total = this.data.totalPrice - (shoppingList[index].price);
     // shoppingList[index].total = parseFloat(shoppingList[index].total) - parseFloat(shoppingList[index].price);
     shoppingList[index].total -= shoppingList[index].price;
     shoppingList[index].num == 1 ? shoppingList.splice(index, 1) : shoppingList[index].num--;
-    // if (shoppingList[index].num == 1) {
-    //   console.log(shoppingList)    
-    //   // debugger  
-    //   shoppingList.splice(index, 1)
-    // } else {
-    //   console.log(shoppingList)
-    //   shoppingList[index].num--
-    // }
+
+    let that = this,
+        foodArray = this.data.foodArray, 
+        foodName = e.target.dataset.name
+    foodArray.map(item => {
+      item.foodsIndex.map(food => {
+        if (food.name == foodName) {
+          if(food.num == 0){ return }
+          food.num ? food.num-- : ''
+          that.setData({ foodArray })
+        }
+      })
+    })
+ 
     this.setData({
       shoppingList: shoppingList,
       totalPrice: total,
       showCar: shoppingList.length == 0 ? false : true,
       totalCount: this.data.totalCount - 1
     });
-    console.log(this.data.totalPrice, this.data.totalCount)
+    // console.log(this.data.totalPrice, this.data.totalCount)
+
+    // 隐藏购物车导航
+    let cartIsHidden = this.data.cartIsHidden,
+        count = this.data.totalCount
+    if (count == 0) {
+      this.setData({
+        cartIsHidden: true
+      })
+    }
   },
 
   /**
@@ -325,7 +423,7 @@ Page({
     wx.showToast({
       title: '加载中',
       icon: 'loading',
-      duration: 0,
+      duration: 10,
       mask: true
     })
     // 发送请求
@@ -342,10 +440,12 @@ Page({
           imgArray: res.data.navArray,
           foodArray: res.data.foodArray
         })
+        wx.hideToast()
       }
-    }, function () {
-      wx.hideToast();
     })
+    // }, function () {
+    //   wx.hideToast();
+    // })
   },
   /**
    * 生命周期函数--监听页面显示
@@ -385,7 +485,23 @@ Page({
   /**
    * 用户点击右上角分享
    */
-  onShareAppMessage: function () {
-
+  onShareAppMessage: function (res) {
+    if (res.from === 'button') {
+      // 来自页面内转发按钮
+      console.log(res.target)
+    }
+    return {
+      title: '点餐小程序',
+      path: '/page/home',
+      success: function (res) {
+        // 转发成功
+        console.log('转发成功')
+      },
+      fail: function (res) {
+        // 转发失败
+        console.log('转发失败')        
+      }
+    }
   },
+
 })

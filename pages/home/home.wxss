@@ -91,9 +91,10 @@ view {
   width: 280rpx;
 }
 .food__num {
-  width: 32rpx;
+  width: 50rpx;
   font-size: 34rpx;
   text-align: center;
+  line-height: 46rpx;
 }
 .food-img {
   width: 150rpx;
@@ -110,6 +111,7 @@ view {
   font-size: 36rpx;
   color: #e02d3f;
   font-weight: 600;
+  margin-top:10rpx;
 }
 .totalInput {
   width: 360rpx;
@@ -117,13 +119,15 @@ view {
 }
 .countNum {
   float: right; 
-  margin-right: 10rpx;
+  margin-right: 20rpx;
   margin-top: 74rpx;
   overflow: hidden;
 }
-.food__add, .food__sub, .food__num {
-  margin-left: 10rpx;
+.addIcon, .subIcon, .food__add, .food__sub, .food__num {
   float: right;
+}
+.subIcon {
+  font-size: 50rpx
 }
 .food__add {
   /* float: right;  */
@@ -200,7 +204,7 @@ view {
 }
 .shopcart-middle {
   flex: 5;
-  background-color: #e02d3f;
+  /* background-color: #e02d3f; */
   border-right: 1rpx solid #fff;
 }
 .shopcart__price {
@@ -309,7 +313,13 @@ view {
   z-index: 100;
   /* bottom: 110rpx; */
   bottom: 90rpx;
-  max-height: 500rpx;
+  /* max-height: 730rpx; */
+}
+.carlist-title {
+  background: #F0F0F0;
+  height: 80rpx;
+  line-height: 80rpx;
+  overflow: hidden;
 }
 
 .label-cart-bar{
@@ -321,7 +331,7 @@ view {
 .icon-clear{
   color: #878787;
   float: right;
-  margin-right: 20rpx;
+  margin-right: 50rpx;
 }
 .label-clear{
   color: #878787;
@@ -329,17 +339,25 @@ view {
 }
 
 .cart-scroll-list{
-  height: 450rpx;
+  /* height: 600rpx; */
+  max-height: 630rpx;
 }
 .cart-list-box{
   background: #FFFFFF;
   display: flex;
-  font-size: 26rpx;
+  font-size: 32rpx;
+  /* line-height 与 height同时设置时 会出现留白  */
+  /* height: 120rpx; */
+  line-height: 120rpx;
 }
 .list-info{
   width: 50%;
   /* padding: 10rpx 30rpx; */
-  padding: 20rpx;
+  padding-left: 20rpx;
+}
+.list-count {
+  width: 50%;
+  padding-right: 20rpx;
 }
 .list-info-size{
   font-size: 20rpx;
@@ -350,9 +368,20 @@ view {
 }
 .icon-li-circle{
   margin-left: 30rpx;
-  font-size: 40rpx
+  font-size: 50rpx
 }
 .font20{
-  font-size: 40rpx
+  font-size: 50rpx
 }
-
+.text-num {
+  display: inline-block;
+  width: 50rpx;
+  text-align: center;
+  line-height: 42rpx;
+}
+.bg-gray {
+  background-color: gray;
+}
+.ver-mid {
+  vertical-align:middle;
+}
