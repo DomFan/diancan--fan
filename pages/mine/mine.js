@@ -1,18 +1,22 @@
 // pages/mine/mine.js
+let app = getApp()
 Page({
 
   /**
    * 页面的初始数据
    */
   data: {
-  
+    userInfo: null,
+
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-  
+    let userInfo = app.globalData.userInfo
+    console.log(app.globalData, userInfo)
+    this.setData({ userInfo })
   },
 
   /**

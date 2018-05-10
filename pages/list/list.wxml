@@ -1,2 +1,7 @@
 <!--pages/list/list.wxml-->
-<text>pages/list/list.wxml</text>
+<view class='list' wx:for="{{orderList}}" wx:key="index" >
+  <view class='card' catchtap='toDetail' data-order='item'>
+    <view class='num'>订单 {{index+1}}</view>
+    <view class='price'>金额：￥{{item.price}}</view>
+  </view>
+</view>

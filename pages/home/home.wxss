@@ -91,10 +91,10 @@ view {
   width: 280rpx;
 }
 .food__num {
-  width: 50rpx;
+  width: 48rpx;
   font-size: 34rpx;
   text-align: center;
-  line-height: 46rpx;
+  line-height: 50rpx;
 }
 .food-img {
   width: 150rpx;
@@ -340,7 +340,7 @@ view {
 
 .cart-scroll-list{
   /* height: 600rpx; */
-  max-height: 630rpx;
+  max-height: 610rpx;
 }
 .cart-list-box{
   background: #FFFFFF;

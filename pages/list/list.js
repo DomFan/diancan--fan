@@ -5,14 +5,21 @@ Page({
    * 页面的初始数据
    */
   data: {
-  
+    orderList: [], // 订单列表
+  },
+
+  // 查看订单详情
+  toDetail: function (e) {
+    console.log(e.target.dataset)
   },
 
   /**
    * 生命周期函数--监听页面加载
    */
   onLoad: function (options) {
-  
+    let orderList = wx.getStorageSync('orderList')
+    console.log(orderList)
+    this.setData({ orderList })
   },
 
   /**
@@ -26,7 +33,9 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-  
+    let orderList = wx.getStorageSync('orderList')
+    console.log(orderList)
+    this.setData({ orderList })
   },
 
   /**

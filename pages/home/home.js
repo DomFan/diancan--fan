@@ -1,10 +1,4 @@
 // pages/home/home.js
-// 初始化动画实例
-let animation = wx.createAnimation({
-  duration: 400,
-  timingFunction: "linear",
-  delay: 0
-});
 Page({
   data: {
     scollTop: 0,
@@ -14,13 +8,10 @@ Page({
     shoppingList: [], // 购物车储存的对象数组
     totalPrice: 0,  // 购物车的总价格
     totalCount: 0,  // 购物车的总数量
-    movelength: 0,  // 上移或下拉动画的单位距离
     cartIsHidden: true, // 购物车是否隐藏
     cartIndexIsHidden: true, // 购物车详情菜单是否隐藏 
-    animationData: {}, // 动画动作对象
     showCar: false, // 是否显示购物车列表
-    countObj: {}, // 计数对象
-    // foodidx: 0,
+    orderList: [],
 
   },
 
@@ -34,7 +25,6 @@ Page({
   },
   // 点击‘+’添加进购物车
   addShopcart: function (e) {
-    let move_length = this.data.movelength;
     let shopping_list = this.data.shoppingList;
     let total_price = this.data.totalPrice;
     let total_count = this.data.totalCount + 1;
@@ -42,15 +32,6 @@ Page({
     let itemNum = 1;
     let that = this;
     let total
-
-    // 创建一空对象 保存点击加号的商品序号 及对应计数 没达到预期效果
-    // let foodidx = e.target.dataset.foodidx
-    // let countObj = this.data.countObj
-    // console.log(foodidx)
-    // !countObj[foodidx] ? countObj[foodidx] = 0 : ''
-    // countObj[foodidx]++
-    // this.setData({ countObj })
-    // this.setData({ foodidx: foodidx})
 
     // 改变整个foodArray数组 添加num计数
     let foodArray = this.data.foodArray
@@ -63,20 +44,6 @@ Page({
         }
       })
     })
-    // for (var i = 0; i < foodArray.length; i++) {
-    //   for (var j = 0; j < foodArray[i].foodsIndex.length; j++) {
-    //     if (foodArray[i].foodsIndex[j].name == foodName) {
-    //       if (!foodArray[i].foodsIndex[j].num) {
-    //         foodArray[i].foodsIndex[j].num = 1
-    //         // console.log(foodArray[i].foodsIndex[j], foodArray[i].foodsIndex[j].num)
-    //       } else {
-    //         foodArray[i].foodsIndex[j].num++            
-    //       }
-    //       that.setData({foodArray})
-    //     }
-    //   }
-    // }
-    // console.log('shopList', this.data.shoppingList, e.target.dataset)
 
     // 是否有同种商品判断
     if (this.data.shoppingList.length > 0) {
@@ -92,10 +59,9 @@ Page({
           price: parseFloat(e.target.dataset.price),
           name: e.target.dataset.name,
           num: itemNum,
-          total: parseFloat(e.target.dataset.price)
+          total: parseFloat(e.target.dataset.price),
+          url: e.target.dataset.url
         })
-        // 动画效果的长度添加
-        move_length++
       }
       // 没有商品时直接添加
     } else {
@@ -103,34 +69,18 @@ Page({
         price: parseFloat(e.target.dataset.price),
         name: e.target.dataset.name,
         num: itemNum,
-        total: parseFloat(e.target.dataset.price)
+        total: parseFloat(e.target.dataset.price),
+        url: e.target.dataset.url
       })
-      move_length++
     }
-    // 动画上拉长度对应的bottom的计算
-    /**
-     *  mlength是bottom的长度
-     *  animation.bottom(mlength).step() 加入动画队列
-     */
-    let mlength = move_length * 55;
-    if (move_length > 1) {
-      mlength = 55 + (move_length - 1) * 65;
-    }
-    this.animation = animation
-    // animation.bottom(mlength).step()
-    this.setData({
-      animationData: animation.export()
-    })
     this.setData({
       shoppingList: shopping_list,
       totalPrice: total_price,
       totalCount: total_count,
       // 购物车当有商品时弹出
-      cartIsHidden: false,
-      movelength: move_length
+      cartIsHidden: false
     })
-
-    console.log(this.data.totalPrice)
+    // console.log(this.data.totalPrice)
   },
   // 点击‘-’删除指定商品
   subShopcart: function (e) {
@@ -156,7 +106,6 @@ Page({
     let itemIndex = shoppingList.findIndex(item => item.name == foodName)
     let item = shoppingList[itemIndex]
     if (item.num == 1) {
-      console.log(1)
       shoppingList.splice(itemIndex, 1)
     } else {
       item.num-= 1
@@ -190,30 +139,20 @@ Page({
   },
   // 购物车详情抽屉点击时弹出
   showCart: function (e) {
-    let move_length = 0;
-    move_length = this.data.movelength * 55;
-    if (this.data.movelength > 1) {
-      move_length = 55 + (this.data.movelength - 1) * 65;
-    }
-    this.animation = animation
-    // animation.bottom(move_length).step()
     let cart_indexIsHidden = !this.data.cartIndexIsHidden;
     this.setData({
-      cartIndexIsHidden: cart_indexIsHidden,
-      animationData: animation.export()
+      cartIndexIsHidden: cart_indexIsHidden
     })
-
     let showCar = this.data.showCar,
         count = this.data.totalCount
     // 如果购物车列表为空 购物车导航不可点击
     if (count == 0) {
       this.setData({ showCar: false})
-      return false
+    } else {
+      this.setData({
+        showCar: !showCar
+      })
     }
-
-    this.setData({
-      showCar: !showCar
-    })
   },
   // 购物车详情抽屉中增加数量
   addShopcartInCart: function (e) {
@@ -229,7 +168,6 @@ Page({
   },
   // 购物车详情抽屉中减少数量,但没有商品时需要抽屉下降并购物车组件消失
   deleteShopcartInCart: function (e) {
-    let move_length = this.data.movelength;
     // 选定被点击的元素
     let addTarget = this.data.shoppingList.findIndex(item => item.name === e.target.dataset.name);
     let tempPrice = 0;
@@ -239,19 +177,8 @@ Page({
       // 总价的减少
       tempPrice = parseInt(this.data.totalPrice) - parseInt(this.data.shoppingList[addTarget].price)
       this.data.shoppingList.splice(addTarget, 1);
-      move_length--;
-      // bottom值变化产生动画
-      let mlength = move_length * 61;
-      if (move_length < 2) {
-        mlength = move_length * 50
-      }
-      if (move_length < 1) {
-        mlength = -55
-      }
+
       console.log(this.data.totalPrice)
-      this.animation = animation
-      // animation.bottom(mlength).step()
-      // 总数等于0时购物车组件设置为消失
       if (total_count == 0) {
         let cart_isHidden = !this.data.cartIsHidden
         console.log(cart_isHidden)
@@ -265,8 +192,6 @@ Page({
       }
       this.setData({
         shoppingList: this.data.shoppingList,
-        movelength: move_length,
-        animationData: animation.export(),
         totalPrice: tempPrice
       })
     } else {
@@ -279,30 +204,41 @@ Page({
       totalPrice: tempPrice,
       totalCount: total_count
     })
-
     console.log(this.data.totalPrice)
   },
-  // 选好了 去结算
+  // **选好了 去结算
   toCount: function (e) {
     let count = this.data.totalCount
     if (count == 0) { return }
     console.log(this.data.totalCount)
-    // 菜单对象
-    let OrderMenu = {
+    
+    // 待支付订单
+    let orderMenu = {
       list: this.data.shoppingList,
       price: this.data.totalPrice,
       count: this.data.totalCount
     }
-    // 本地存储菜单对象
-    wx.setStorage({
-      key: "OrderMenu",
-      data: OrderMenu
-    });
+    // 本地存储待支付订单
+    wx.setStorageSync('orderMenu', orderMenu)
 
-    // 提交订单
+    // 使用本地存储 模拟 已支付订单列表
+    let orderList = this.data.orderList
+    orderList.push(orderMenu)
+    this.setData({ orderList })
+    wx.setStorageSync('orderList', orderList)
+
+    // 将购物车商品列表隐藏
+    this.setData({
+      showCar: false
+    })
+
+    // 提交订单 跳转到待支付订单页面
     wx.navigateTo({
       url: '../order/order'
     })
+  },
+  setLocalStorage: function () {
+    
   },
   // 显示隐藏购物车列表
   showCartList: function (e) {
@@ -342,8 +278,6 @@ Page({
     shoppingList[index].total = parseFloat(shoppingList[index].total.toFixed(2))
 
     console.log(shoppingList[index].num, shoppingList)
-    // console.log(typeof total,typeof this.data.totalPrice, typeof shoppingList[index].total, typeof shoppingList[index].price)
-
     let that = this,
         foodArray = this.data.foodArray,
         foodName = e.target.dataset.name

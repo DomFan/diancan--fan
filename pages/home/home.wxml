@@ -2,7 +2,7 @@
 <view class="container">
   <scroll-view class="side-nav" style="height:100%;" scroll-y="true">
     <view class="type-list">
-      <view class="type-item" wx:for="{{imgArray}}" wx:for-item="item" wx:key='index' bindtap="changepage" id="{{index}}" scroll-top="{{scollTop}}">
+      <view class="type-item" wx:for="{{imgArray}}" wx:for-item="item" wx:key='index' catchtap="changepage" id="{{index}}" scroll-top="{{scollTop}}">
         <view class="type__img" style="background:url('{{item.url}}');background-size: contain;"></view>
         <view class="type__desc">{{item.title}}</view>
       </view>
@@ -21,9 +21,9 @@
           <view class="food__price">￥ {{food.price}}</view>
         </view>
         <view class='countNum'>
-          <i class="addIcon iconfont icon-jiahao2fill activity-color font20" data-foodidx="{{index}}{{foodindex}}" data-price="{{food.price}}" data-name="{{food.name}}" catchtap="addShopcart"></i>
+          <i class="addIcon iconfont icon-jiahao2fill activity-color font20" data-foodidx="{{index}}{{foodindex}}" data-price="{{food.price}}" data-name="{{food.name}}" data-url="{{food.url}}" catchtap="addShopcart"></i>
           <view wx:if='{{food.num > 0}}' class='food__num'>{{food.num}}</view>
-          <i wx:if='{{food.num > 0}}' class="subIcon iconfont icon-jian" data-foodidx="{{index}}{{foodindex}}" data-price="{{food.price}}" data-name="{{food.name}}" bindtap="subShopcart"></i>
+          <i wx:if='{{food.num > 0}}' class="subIcon iconfont icon-jian" data-foodidx="{{index}}{{foodindex}}" data-price="{{food.price}}" data-name="{{food.name}}" data-url="{{food.url}}" catchtap="subShopcart"></i>
         </view>
         
       </view>
@@ -31,7 +31,7 @@
   </scroll-view>
 
   <!--购物车导航  -->
-  <view class="shopcart {{totalCount==0 ? 'bg-gray' : ''}}" bindtap="showCart" hidden="{{cartIsHidden}}">
+  <view class="shopcart {{totalCount==0 ? 'bg-gray' : ''}}" catchtap="showCart" hidden="{{cartIsHidden}}">
     <view class="shopcart-main">
       <view class="shopcart-left">
         <image src="../../image/car_s.png" class="shopcart__icon"></image>
@@ -45,7 +45,7 @@
         </view>
       </view>
       <view class="shopcart-right" catchtap="toCount">
-        <text>选好了</text>
+        <text>去结算</text>
       </view>
     </view>
   </view>
@@ -53,13 +53,13 @@
 
 <!--购物车列表  -->
   <!--遮罩层  -->
-<view class='mask' bindtap="showCartList" data-statu="close" wx:if='{{showCar}}'></view>
+<view class='mask' catchtap="showCartList" data-statu="close" wx:if='{{showCar}}'></view>
 <view class='cartlist-float' wx:if='{{showCar}}'>
   <view class='carlist-title'>
     <label class='label-cart-bar'>
       <label style='padding:5px'>已选商品</label>
     </label>
-    <label class='icon-clear' bindtap='clearCartList'>
+    <label class='icon-clear' catchtap='clearCartList'>
       <i class="iconfont icon-lajitong"></i>
       <label class="label-clear">清空购物车</label>
     </label>
@@ -74,9 +74,9 @@
       <view class='list-count'>
         <view style='float:right'>
           <label class='activity-color'>￥{{item.total}}</label>
-          <i class="iconfont icon-jian icon-li-circle ver-mid" data-name="{{item.name}}" data-index="{{index}}" bindtap="decNumber"></i>
+          <i class="iconfont icon-jian icon-li-circle ver-mid" data-name="{{item.name}}" data-index="{{index}}" data-url="{{food.url}}" catchtap="decNumber"></i>
           <view class='text-num ver-mid'>{{item.num}}</view>
-          <i class="iconfont icon-jiahao2fill activity-color font20 ver-mid" data-name="{{item.name}}" data-index="{{index}}" bindtap="addNumber"></i>
+          <i class="iconfont icon-jiahao2fill activity-color font20 ver-mid" data-name="{{item.name}}" data-index="{{index}}" data-url="{{food.url}}" catchtap="addNumber"></i>
         </view>
       </view>
     </view>
