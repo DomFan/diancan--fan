@@ -1,5 +1,6 @@
 {
   "pages":[
+    "pages/evaluation/evaluation",
     "pages/home/home",
     "pages/list/list",
     "pages/list/detail",

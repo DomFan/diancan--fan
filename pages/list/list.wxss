@@ -3,16 +3,24 @@ page {
   width: 100%;
   height: 100%;
 }
+view {
+  box-sizing: border-box;
+}
 .list {
   width: 100%;
+  display: flex;
+  justify-content: center;
 }
 .card {
-  width: 100%;
+  width: 95%;
+  height: 120rpx;
+  line-height: 120rpx;
   padding: 0 20rpx;
   background-color: #fafafa;
-  border: 1rpx solid #f1f1f1;
+  /* border: 1rpx solid #f1f1f1; */
   border-radius: 4%;
   overflow: hidden;
+  margin-bottom: 20rpx;
 }
 .num {
   float: left;
@@ -20,5 +28,11 @@ page {
 }
 .price {
   float: right;
-  width: 50%;
+  width: 35%;
+  /* text-align: right; */
+}
+.btn {
+  width: 100%;
+  height: 120rpx;
+  /* background-color: lightgrey; */
 }
