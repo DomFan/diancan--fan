@@ -3,6 +3,6 @@
   <view class='card'>
     <view class='num'>订单 {{index+1}}</view>
     <view class='price'>金额：￥{{item.price}}</view>
-    <view class='btn' data-order='{{item}}' catchtap='toDetail'></view>
+    <view class='btn' data-index="{{index}}" data-order='{{item}}' bindtap='toDetail'></view>
   </view>
 </view>

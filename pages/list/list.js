@@ -11,6 +11,20 @@ Page({
   // 查看订单详情
   toDetail: function (e) {
     console.log(e.target.dataset)
+    let menu,
+        index = e.target.dataset.index+ 1,
+        order = e.target.dataset.order
+    wx.setStorageSync('menu', {})
+    menu = {
+      index: index,
+      order: order
+    }
+    wx.setStorageSync('menu', menu)
+
+    wx.navigateTo({
+      // url: './detail?index=' + index + '&order=' + order,
+      url: './detail',
+    })
   },
 
   /**
@@ -18,7 +32,7 @@ Page({
    */
   onLoad: function (options) {
     let orderList = wx.getStorageSync('orderList')
-    console.log(orderList)
+    // console.log(orderList)
     this.setData({ orderList })
   },
 

@@ -6,6 +6,7 @@
     "pages/order/order",
     "pages/mine/mine",
     "pages/index/index",
+    "pages/product/product",
     "pages/evaluation/evaluation",
     "pages/logs/logs"
   ],

@@ -1,2 +1,22 @@
 <!--pages/list/detail.wxml-->
-<text>pages/list/detail.wxml</text>
+<view class='wrap'>
+  <view class='header'>订单 {{menu.index}}</view>
+  <view class='items' wx:for='{{menu.order.list}}' wx:for-item='food' wx:key='index'>
+    <view class='item'>
+      <view class='item-left'>
+        <image class='item-pic' src='{{food.url}}'></image>
+      </view>
+      <view class='item-right'>
+        <view class='item-title'>{{food.name}}</view>
+        <view class='item-count'>
+          <view class='item-num'>{{food.num}} 份</view>
+          <view class='item-total'>￥ {{food.total}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+  <view class='footer'>
+    <view class='menu-count'>共{{menu.order.count}}份</view>
+    <view class='menu-price'>合计：￥ {{menu.order.price}}</view>
+  </view>

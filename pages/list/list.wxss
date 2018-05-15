@@ -24,15 +24,17 @@ view {
 }
 .num {
   float: left;
-  width: 50%;
+  width: 60%;
 }
 .price {
   float: right;
-  width: 35%;
+  width: 40%;
   /* text-align: right; */
 }
 .btn {
+  position: relative;
   width: 100%;
   height: 120rpx;
-  /* background-color: lightgrey; */
+  /* z-index: 10; */
+  /* background-color: lightgrey;  */
 }
