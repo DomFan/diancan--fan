@@ -2,16 +2,19 @@
 <view class="container">
   <scroll-view class="side-nav" style="height:100%;" scroll-y="true">
     <view class="type-list">
-      <view class="type-item" wx:for="{{imgArray}}" wx:for-item="item" wx:key='index' catchtap="changepage" id="{{index}}" scroll-top="{{scollTop}}">
-        <view class="type__img" style="background:url('{{item.url}}');background-size: contain;"></view>
-        <view class="type__desc">{{item.title}}</view>
+       <view class="type-item {{navid == index? 'bg-ccc' : ''}}" wx:for="{{imgArray}}" wx:for-item="item" wx:key='index' catchtap="changepage" data-navid="{{index}}" id="{{index}}" scroll-top="{{scollTop}}"> 
+        <view class="type__wrap {{navid == item.index? 'bg-ccc' : ''}}">
+          <view class="type__img" style="background:url('{{item.url}}');background-size: contain;"></view>
+          <view class="type__desc">{{item.title}}</view>
+        </view>
       </view>
     </view>
   </scroll-view>
   <!--scroll_into_view  值应为某子元素id（id不能以数字开头）。设置哪个方向可滚动，则在哪个方向滚动到该元素  -->
-  <scroll-view class="main-page" style="height:100%;" scroll-y="true" scroll-into-view="{{scroll_into_view}}">
+  <scroll-view class="main-page" style="height:100%;" scroll-y="true" scroll-into-view="{{scroll_into_view}}" catchscroll="scroll">
     <view class="food-list" wx:for="{{foodArray}}" wx:for-item="item" wx:key='index' id="foodtype{{index}}">
       <view class="food__title">{{item.title}}</view>
+      <!-- <view class="food-item" wx:for="{{item.foodsIndex}}" wx:for-item="food" wx:for-index="foodindex" wx:key='index' id="food{{index}}"> -->
       <view class="food-item" wx:for="{{item.foodsIndex}}" wx:for-item="food" wx:for-index="foodindex" wx:key='index' id="food{{index}}">
         <view class='food-left'>
           <image class="food-img" src='{{food.url}}'></image>

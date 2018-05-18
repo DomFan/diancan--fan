@@ -3,6 +3,7 @@ Page({
   data: {
     scollTop: 0,
     scroll_into_view: 'foodtype0', // scroll-view的初始位置
+    navid: 0,
     imgArray: [], // 导航的图片数组，通过ajax获取
     foodArray: [], // 食品的对象数组
     shoppingList: [], // 购物车储存的对象数组
@@ -12,6 +13,7 @@ Page({
     cartIndexIsHidden: true, // 购物车详情菜单是否隐藏 
     showCar: false, // 是否显示购物车列表
     orderList: [],
+    merchantId: "40cac207375a4438bdf537229164d09d",
 
   },
 
@@ -19,9 +21,16 @@ Page({
   changepage: function (e) {
     // 滚动到指定的id
     let goPage = e.currentTarget.id
+    // console.log(e.target.dataset, e.currentTarget)
+    // console.log(e.currentTarget.dataset.navid, typeof e.currentTarget.dataset.navid)
     this.setData({
-      scroll_into_view: "foodtype" + goPage
+      scroll_into_view: "foodtype" + goPage, 
+      navid: e.currentTarget.dataset.navid.toString()
     })
+  },
+  scroll: function (e) {
+    console.log('scrollTop', e.detail.scrollTop)
+    
   },
   // 点击‘+’添加进购物车
   addShopcart: function (e) {
@@ -359,6 +368,46 @@ Page({
       icon: 'loading',
       duration: 10,
       mask: true
+    })
+
+    // 类目接口
+    wx.request({
+      url: 'http://192.168.98.157/dcback/categoryController/page',
+      data: {
+        merchantId: "40cac207375a4438bdf537229164d09d"
+      },
+      header: {
+        'Accept': 'application/json'
+      },
+      method: 'GET',
+      dataType: 'json',
+      responseType: 'text',
+      success: function(res) {
+        // console.log(res)
+        console.log(res.data)
+      },
+      fail: function(res) {},
+      complete: function(res) {
+        // console.log(res)
+      },
+    })
+    // 商品列表
+    wx.request({
+      url: 'http://192.168.98.157/dcback/productController/page',
+      data: {
+        merchantId: "40cac207375a4438bdf537229164d09d"
+      },
+      header: {
+        'Accept': 'application/json'
+      },
+      method: 'GET',
+      dataType: 'json',
+      responseType: 'text',
+      success: function(res) {
+        console.log(res)
+      },
+      fail: function(res) {},
+      complete: function(res) {},
     })
     // 发送请求
     wx.request({
