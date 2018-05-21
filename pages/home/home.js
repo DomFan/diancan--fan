@@ -29,25 +29,29 @@ Page({
     })
   },
   scroll: function (e) {
-    console.log('scrollTop', e.detail.scrollTop)
+    // console.log('scrollTop', e.detail.scrollTop)
     
   },
   // 点击‘+’添加进购物车
   addShopcart: function (e) {
     let shopping_list = this.data.shoppingList;
-    let total_price = this.data.totalPrice;
+    let total_price = parseFloat(parseFloat(this.data.totalPrice).toFixed(2));
     let total_count = this.data.totalCount + 1;
-    total_price = parseFloat(total_price) + parseFloat(e.target.dataset.price);
+    let price = e.target.dataset.price
+    total_price = +parseFloat(total_price + price).toFixed(2);
+    // console.log(total_price, e.target.dataset.price)
+    // debugger
     let itemNum = 1;
     let that = this;
     let total
 
     // 改变整个foodArray数组 添加num计数
     let foodArray = this.data.foodArray
-    let foodName = e.target.dataset.name
+    let id = e.target.dataset.id
     foodArray.map(item =>{
-      item.foodsIndex.map(food =>{
-        if (food.name == foodName) {
+      // item.foodsIndex.map(food => {
+      item.productlist.map(food => {
+        if (food.id == id) {
           !food.num ? food.num = 1 : food.num++
           that.setData({foodArray})
         }
@@ -57,31 +61,35 @@ Page({
     // 是否有同种商品判断
     if (this.data.shoppingList.length > 0) {
       // 商品名是否相同判断，不重复添加同名商品
-      let isHave = this.data.shoppingList.findIndex(item => item.name == foodName)
+      let isHave = this.data.shoppingList.findIndex(item => item.id == id)
       if (isHave != -1) {
         that.data.shoppingList[isHave].num++
         total = that.data.shoppingList[isHave].num*that.data.shoppingList[isHave].price
+        total = parseFloat(total.toFixed(2))
         that.data.shoppingList[isHave].total = total
       } else {
         // 购物车数组加进新的一样食品
         that.data.shoppingList.push({
-          price: parseFloat(e.target.dataset.price),
+          id: id,
+          price: parseFloat(e.target.dataset.price.toFixed(2)),
           name: e.target.dataset.name,
           num: itemNum,
-          total: parseFloat(e.target.dataset.price),
+          total: parseFloat(e.target.dataset.price.toFixed(2)),
           url: e.target.dataset.url
         })
       }
       // 没有商品时直接添加
     } else {
       this.data.shoppingList.push({
-        price: parseFloat(e.target.dataset.price),
+        id: id,
+        price: parseFloat(e.target.dataset.price.toFixed(2)),
         name: e.target.dataset.name,
         num: itemNum,
-        total: parseFloat(e.target.dataset.price),
+        total: parseFloat(e.target.dataset.price.toFixed(2)),
         url: e.target.dataset.url
       })
     }
+    total_price = parseFloat(total_price).toFixed(2)
     this.setData({
       shoppingList: shopping_list,
       totalPrice: total_price,
@@ -95,42 +103,41 @@ Page({
   subShopcart: function (e) {
     let that = this,
         total_count = this.data.totalCount,
-        total_price = this.data.totalPrice,
+        total_price = parseFloat(this.data.totalPrice),
         shoppingList = this.data.shoppingList,
         foodArray = this.data.foodArray,
         itemNum = 1
+
+    total_price = parseFloat(total_price.toFixed(2))
     // 点击的商品信息
     let foodPrice = e.target.dataset.price,
-        foodName = e.target.dataset.name
+        foodName = e.target.dataset.name,
+        id = e.target.dataset.id
+        console.log(foodPrice, foodName)
     // 计算总价
-    total_price = parseFloat(total_price) - parseFloat(foodPrice);
+    total_price = (total_price - foodPrice).toFixed(2);
+    total_price = parseFloat(total_price)
     // 修改主体中商品数量
     foodArray.map(item => {
-      item.foodsIndex.map(food => {
-        food.name == foodName ? food.num-- : ''
+      // item.foodsIndex.map(food => {
+      item.productlist.map(food => {
+        food.id == id ? food.num-- : ''
       })
     })
     that.setData({ foodArray })
     // 修改购物车列表中物品数量及价格
-    let itemIndex = shoppingList.findIndex(item => item.name == foodName)
+    let itemIndex = shoppingList.findIndex(item => item.id == id)
     let item = shoppingList[itemIndex]
     if (item.num == 1) {
       shoppingList.splice(itemIndex, 1)
     } else {
+      // debugger
       item.num-= 1
-      item.total -=item.price
+      item.total -= item.price
+      item.total = parseFloat(item.total.toFixed(2))
     }
-    // shoppingList.map(item => {
-    //   if (item.name == foodName) {
-    //     if (item.num == 0) {
-    //       shoppingList.splice(itemIndex, 1)
-    //     } else {
-    //       item.num-= 1
-    //       item.total-= item.price
-    //     }
-    //   }
-    // })
-    // console.log(shoppingList)
+    
+    console.log(shoppingList, total_price)
     this.setData({
       shoppingList: shoppingList,
       totalPrice: total_price,
@@ -162,58 +169,6 @@ Page({
         showCar: !showCar
       })
     }
-  },
-  // 购物车详情抽屉中增加数量
-  addShopcartInCart: function (e) {
-    let total_count = this.data.totalCount + 1;
-    let addTarget = this.data.shoppingList.findIndex(item => item.name === e.target.dataset.name);
-    this.data.shoppingList[addTarget].num++;
-    let tempPrice = parseInt(this.data.totalPrice) + parseInt(this.data.shoppingList[addTarget].price)
-    this.setData({
-      shoppingList: this.data.shoppingList,
-      totalPrice: tempPrice,
-      totalCount: total_count
-    })
-  },
-  // 购物车详情抽屉中减少数量,但没有商品时需要抽屉下降并购物车组件消失
-  deleteShopcartInCart: function (e) {
-    // 选定被点击的元素
-    let addTarget = this.data.shoppingList.findIndex(item => item.name === e.target.dataset.name);
-    let tempPrice = 0;
-    let total_count = this.data.totalCount - 1;
-    this.data.shoppingList[addTarget].num--;
-    if (this.data.shoppingList[addTarget].num < 1) {
-      // 总价的减少
-      tempPrice = parseInt(this.data.totalPrice) - parseInt(this.data.shoppingList[addTarget].price)
-      this.data.shoppingList.splice(addTarget, 1);
-
-      console.log(this.data.totalPrice)
-      if (total_count == 0) {
-        let cart_isHidden = !this.data.cartIsHidden
-        console.log(cart_isHidden)
-        // 这里设置一个计时器，让下拉抽屉动画完成后再消失组件，不然体验性太差
-        setTimeout(() => {
-          this.setData({
-            cartIsHidden: cart_isHidden
-          })
-        }, 1000)
-
-      }
-      this.setData({
-        shoppingList: this.data.shoppingList,
-        totalPrice: tempPrice
-      })
-    } else {
-      // 计算出来新的价格
-      tempPrice = parseInt(this.data.totalPrice) - parseInt(this.data.shoppingList[addTarget].price)
-      console.log(this.data.totalPrice)
-    }
-    this.setData({
-      shoppingList: this.data.shoppingList,
-      totalPrice: tempPrice,
-      totalCount: total_count
-    })
-    console.log(this.data.totalPrice)
   },
   // **选好了 去结算
   toCount: function (e) {
@@ -247,7 +202,7 @@ Page({
     })
   },
   setLocalStorage: function () {
-    
+    // ?????
   },
   // 显示隐藏购物车列表
   showCartList: function (e) {
@@ -262,11 +217,12 @@ Page({
   clearCartList: function () {
     let foodArray = this.data.foodArray
     foodArray.map(item => {
-      item.foodsIndex.map(food => { 
+      // item.foodsIndex.map(food => { 
+      item.productlist.map(food => { 
         food.num ? food.num = 0 : ''
       })
     })
-        this.setData({ foodArray })
+    this.setData({ foodArray })
     this.setData({
       shoppingList: [],
       showCar: false,
@@ -276,23 +232,24 @@ Page({
   },
   // 购物车 +
   addNumber: function (e) {
-    var index = e.currentTarget.dataset.index;
-    console.log(index)
-    var shoppingList = this.data.shoppingList;
+    let id = e.target.dataset.id
+    let index = e.currentTarget.dataset.index;
+    // console.log(index)
+    let shoppingList = this.data.shoppingList;
     shoppingList[index].num++;
-    var total = this.data.totalPrice + (shoppingList[index].price);
-    total = parseFloat(total.toFixed(2))
+    let total = this.data.totalPrice + (shoppingList[index].price);
+    total = parseFloat(total).toFixed(2)
     shoppingList[index].total += (shoppingList[index].price);
     // 保留两位小数
-    shoppingList[index].total = parseFloat(shoppingList[index].total.toFixed(2))
+    shoppingList[index].total = +parseFloat(shoppingList[index].total).toFixed(2)
 
     console.log(shoppingList[index].num, shoppingList)
     let that = this,
-        foodArray = this.data.foodArray,
-        foodName = e.target.dataset.name
+        foodArray = this.data.foodArray
     foodArray.map(item => {
-      item.foodsIndex.map(food => {
-        if (food.name == foodName) {
+      // item.foodsIndex.map(food => {
+      item.productlist.map(food => {
+        if (food.id == id) {
           !food.num ? food.num = 1 : food.num++
           that.setData({ foodArray })
         }
@@ -304,32 +261,39 @@ Page({
       totalPrice: total,
       totalCount: this.data.totalCount + 1
     })
-    console.log(this.data.totalPrice, this.data.totalCount)
+    // console.log(this.data.totalPrice, this.data.totalCount)
   },
   // 购物车 -
   decNumber: function (e) {
-    var index = e.currentTarget.dataset.index;
+    // console.log(e)
+    let id = e.target.dataset.id
+    console.log(id)
+    let index = e.currentTarget.dataset.index;
     // console.log(index)
-    var shoppingList = this.data.shoppingList;
+    let shoppingList = this.data.shoppingList;
 
-    var total = this.data.totalPrice - (shoppingList[index].price);
-    // shoppingList[index].total = parseFloat(shoppingList[index].total) - parseFloat(shoppingList[index].price);
-    shoppingList[index].total -= shoppingList[index].price;
+    let total = parseFloat(this.data.totalPrice - shoppingList[index].price.toFixed(2));
+    shoppingList[index].total -= parseFloat(shoppingList[index].price.toFixed(2));
+    shoppingList[index].total = parseFloat(shoppingList[index].total.toFixed(2))
     shoppingList[index].num == 1 ? shoppingList.splice(index, 1) : shoppingList[index].num--;
 
     let that = this,
-        foodArray = this.data.foodArray, 
-        foodName = e.target.dataset.name
+        foodArray = this.data.foodArray
     foodArray.map(item => {
-      item.foodsIndex.map(food => {
-        if (food.name == foodName) {
+      // item.foodsIndex.map(food => {
+      item.productlist.map(food => {
+        if (food.id == id) {
           if(food.num == 0){ return }
-          food.num ? food.num-- : ''
-          that.setData({ foodArray })
+          else {
+            food.num ? food.num-- : ''
+            that.setData({ foodArray })
+
+          }
         }
       })
     })
  
+    total = parseFloat(parseFloat(total).toFixed(2))
     this.setData({
       shoppingList: shoppingList,
       totalPrice: total,
@@ -362,7 +326,9 @@ Page({
    */
   // 加载ajax的最佳时机
   onLoad: function (options) {
-    let that = this
+    console.log(options)
+    let that = this,
+        imgArray = this.data.imgArray
     wx.showToast({
       title: '加载中',
       icon: 'loading',
@@ -370,30 +336,11 @@ Page({
       mask: true
     })
 
-    // 类目接口
-    wx.request({
-      url: 'http://192.168.98.157/dcback/categoryController/page',
-      data: {
-        merchantId: "40cac207375a4438bdf537229164d09d"
-      },
-      header: {
-        'Accept': 'application/json'
-      },
-      method: 'GET',
-      dataType: 'json',
-      responseType: 'text',
-      success: function(res) {
-        // console.log(res)
-        console.log(res.data)
-      },
-      fail: function(res) {},
-      complete: function(res) {
-        // console.log(res)
-      },
-    })
+
     // 商品列表
     wx.request({
-      url: 'http://192.168.98.157/dcback/productController/page',
+      // url: 'http://192.168.98.157/dcback/productController/page',
+      url: 'http://192.168.98.157/dcback/productController/xcxPage',
       data: {
         merchantId: "40cac207375a4438bdf537229164d09d"
       },
@@ -404,11 +351,23 @@ Page({
       dataType: 'json',
       responseType: 'text',
       success: function(res) {
-        console.log(res)
+        console.log(res.data.total)
+
+        let array = res.data.total
+        array.map(item => {
+          imgArray.push({"categoryName": item.categoryName})
+        })
+
+        that.setData({
+          imgArray: imgArray,
+          foodArray: array
+        })
       },
       fail: function(res) {},
       complete: function(res) {},
     })
+
+    return
     // 发送请求
     wx.request({
       url: 'http://easy-mock.com/mock/5905d4597a878d73716e2c6b/kfc/kfc',
@@ -420,7 +379,7 @@ Page({
       success: function (res) {
         console.log(res.data)
         that.setData({
-          imgArray: res.data.navArray,
+          imgArray: res.data.naletray,
           foodArray: res.data.foodArray
         })
         wx.hideToast()

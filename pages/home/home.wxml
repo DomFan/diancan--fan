@@ -1,20 +1,40 @@
 <!--pages/home/home.wxml-->
 <view class="container">
-  <scroll-view class="side-nav" style="height:100%;" scroll-y="true">
+  <scroll-view class="side-nav {{cartIsHidden ? '' : 'padding_bottom'}}" style="height:100%;" scroll-y="true">
     <view class="type-list">
        <view class="type-item {{navid == index? 'bg-ccc' : ''}}" wx:for="{{imgArray}}" wx:for-item="item" wx:key='index' catchtap="changepage" data-navid="{{index}}" id="{{index}}" scroll-top="{{scollTop}}"> 
         <view class="type__wrap {{navid == item.index? 'bg-ccc' : ''}}">
-          <view class="type__img" style="background:url('{{item.url}}');background-size: contain;"></view>
-          <view class="type__desc">{{item.title}}</view>
+          <view wx:if='{{item.url}}' class="type__img" style="background:url('{{item.url}}');background-size: contain;"></view>
+          <view class="type__desc">{{item.categoryName}}</view>
         </view>
       </view>
     </view>
   </scroll-view>
   <!--scroll_into_view  值应为某子元素id（id不能以数字开头）。设置哪个方向可滚动，则在哪个方向滚动到该元素  -->
-  <scroll-view class="main-page" style="height:100%;" scroll-y="true" scroll-into-view="{{scroll_into_view}}" catchscroll="scroll">
+  <scroll-view class="main-page {{cartIsHidden ? '' : 'padding_bottom'}}" style="height:100%;" scroll-y="true" scroll-into-view="{{scroll_into_view}}" catchscroll="scroll">
+    <view class="food-list" wx:for="{{foodArray}}" wx:for-item="item" wx:key='index' id="foodtype{{index}}">
+      <view class="food__title">{{item.categoryName}}</view>
+      <!-- <view class="food-item" wx:for="{{item.foodsIndex}}" wx:for-item="food" wx:for-index="foodindex" wx:key='index' id="food{{index}}"> -->
+      <view class="food-item" wx:for="{{item.productlist}}" wx:for-item="food" wx:for-index="foodindex" wx:key='index' id="food{{index}}">
+        <view class='food-left'>
+          <image class="food-img" src='http://192.168.98.157{{food.productIcon}}'></image>
+        </view>
+        <view class="food-right">
+          <view class="food__name">{{food.productName}}</view>
+          <view class="food__price">￥ {{food.productPrice}}</view>
+        </view>
+        <view class='countNum'>
+          <i class="addIcon iconfont icon-jiahao2fill activity-color font20" data-foodidx="{{index}}{{foodindex}}" data-price="{{food.productPrice}}" data-id='{{food.id}}' data-name="{{food.productName}}" data-url="http://192.168.98.157{{food.productIcon}}" catchtap="addShopcart"></i>
+          <view wx:if='{{food.num > 0}}' class='food__num'>{{food.num}}</view>
+          <i wx:if='{{food.num > 0}}' class="subIcon iconfont icon-jian" data-foodidx="{{index}}{{foodindex}}" data-price="{{food.productPrice}}" data-id='{{food.id}}' data-name="{{food.productName}}" data-url="http://192.168.98.157{{food.productIcon}}" catchtap="subShopcart"></i>
+        </view>
+        
+      </view>
+    </view>
+  </scroll-view>
+  <!-- <scroll-view class="main-page" style="height:100%;" scroll-y="true" scroll-into-view="{{scroll_into_view}}" catchscroll="scroll">
     <view class="food-list" wx:for="{{foodArray}}" wx:for-item="item" wx:key='index' id="foodtype{{index}}">
       <view class="food__title">{{item.title}}</view>
-      <!-- <view class="food-item" wx:for="{{item.foodsIndex}}" wx:for-item="food" wx:for-index="foodindex" wx:key='index' id="food{{index}}"> -->
       <view class="food-item" wx:for="{{item.foodsIndex}}" wx:for-item="food" wx:for-index="foodindex" wx:key='index' id="food{{index}}">
         <view class='food-left'>
           <image class="food-img" src='{{food.url}}'></image>
@@ -31,7 +51,7 @@
         
       </view>
     </view>
-  </scroll-view>
+  </scroll-view> -->
 
   <!--购物车导航  -->
   <view class="shopcart {{totalCount==0 ? 'bg-gray' : ''}}" catchtap="showCart" hidden="{{cartIsHidden}}">
@@ -77,9 +97,9 @@
       <view class='list-count'>
         <view style='float:right'>
           <label class='activity-color'>￥{{item.total}}</label>
-          <i class="iconfont icon-jian icon-li-circle ver-mid" data-name="{{item.name}}" data-index="{{index}}" data-url="{{food.url}}" catchtap="decNumber"></i>
+          <i class="iconfont icon-jian icon-li-circle ver-mid" data-price='{{item.price}}' data-id='{{item.id}}' data-name="{{item.name}}" data-index="{{index}}" data-url="{{food.url}}" catchtap="decNumber"></i>
           <view class='text-num ver-mid'>{{item.num}}</view>
-          <i class="iconfont icon-jiahao2fill activity-color font20 ver-mid" data-name="{{item.name}}" data-index="{{index}}" data-url="{{food.url}}" catchtap="addNumber"></i>
+          <i class="iconfont icon-jiahao2fill activity-color font20 ver-mid" data-price='{{item.price}}' data-id='{{item.id}}' data-name="{{item.name}}" data-index="{{index}}" data-url="{{item.url}}" catchtap="addNumber"></i>
         </view>
       </view>
     </view>
