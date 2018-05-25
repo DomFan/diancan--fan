@@ -1,4 +1,5 @@
 // pages/home/home.js
+let app = getApp()
 Page({
   data: {
     scollTop: 0,
@@ -14,6 +15,7 @@ Page({
     showCar: false, // 是否显示购物车列表
     orderList: [],
     merchantId: "40cac207375a4438bdf537229164d09d",
+    hide_good_box: true, // 是否隐藏小球
 
   },
 
@@ -89,7 +91,7 @@ Page({
         url: e.target.dataset.url
       })
     }
-    total_price = parseFloat(total_price).toFixed(2)
+    total_price = +parseFloat(total_price).toFixed(2)
     this.setData({
       shoppingList: shopping_list,
       totalPrice: total_price,
@@ -98,6 +100,66 @@ Page({
       cartIsHidden: false
     })
     // console.log(this.data.totalPrice)
+
+    // 小球动画 点击时手指位置
+    this.finger = {};
+    // 顶点位置
+    var topPoint = {};
+    // 点击的坐标
+    this.finger['x'] = e.touches["0"].clientX;
+    this.finger['y'] = e.touches["0"].clientY;
+    // console.log(e.touches["0"])
+    // console.log(this.finger)
+
+    if (this.finger['y'] < this.busPos['y']) {
+      topPoint['y'] = this.finger['y'] - 150;
+    } else {
+      topPoint['y'] = this.busPos['y'] - 150;
+    }
+    // Math.abs() 取绝对值
+    // topPoint['x'] = Math.abs(this.finger['x'] - this.busPos['x']) / 2;
+
+    if (this.finger['x'] > this.busPos['x']) {
+      topPoint['x'] = (this.finger['x'] - this.busPos['x']) / 2 + this.busPos['x'];
+    } else {//
+      topPoint['x'] = (this.busPos['x'] - this.finger['x']) / 2 + this.finger['x'];
+    }
+
+    //topPoint['x'] = this.busPos['x'] + 80
+    // this.linePos = app.bezier([this.finger, topPoint, this.busPos], 30);
+    this.linePos = app.bezier([this.busPos, topPoint, this.finger], 30);
+    this.startAnimation(e);
+  },
+
+  // 动画
+  startAnimation: function (e) {
+    var index = 0,
+      that = this,
+      bezier_points = that.linePos['bezier_points'];
+
+    this.setData({
+      hide_good_box: false,
+      bus_x: that.finger['x'],
+      bus_y: that.finger['y']
+    })
+    var len = bezier_points.length;
+    index = len
+    this.timer = setInterval(function () {
+      index--;
+      // 条件控制 清零时 return
+      if (!bezier_points[index]) { return }
+      that.setData({
+        bus_x: bezier_points[index]['x'],
+        bus_y: bezier_points[index]['y']
+      })
+      if (index < 1) {
+        clearInterval(that.timer);
+        // that.addGoodToCartFn(e);
+        that.setData({
+          hide_good_box: true
+        })
+      }
+    }, 10);
   },
   // 点击‘-’删除指定商品
   subShopcart: function (e) {
@@ -108,7 +170,7 @@ Page({
         foodArray = this.data.foodArray,
         itemNum = 1
 
-    total_price = parseFloat(total_price.toFixed(2))
+    total_price = +parseFloat(total_price.toFixed(2))
     // 点击的商品信息
     let foodPrice = e.target.dataset.price,
         foodName = e.target.dataset.name,
@@ -116,7 +178,7 @@ Page({
         console.log(foodPrice, foodName)
     // 计算总价
     total_price = (total_price - foodPrice).toFixed(2);
-    total_price = parseFloat(total_price)
+    total_price = +parseFloat(total_price).toFixed(2)
     // 修改主体中商品数量
     foodArray.map(item => {
       // item.foodsIndex.map(food => {
@@ -238,7 +300,8 @@ Page({
     let shoppingList = this.data.shoppingList;
     shoppingList[index].num++;
     let total = this.data.totalPrice + (shoppingList[index].price);
-    total = parseFloat(total).toFixed(2)
+    console.log(this.data.totalPrice, shoppingList[index].price)
+    total = +parseFloat(total).toFixed(2)
     shoppingList[index].total += (shoppingList[index].price);
     // 保留两位小数
     shoppingList[index].total = +parseFloat(shoppingList[index].total).toFixed(2)
@@ -255,7 +318,6 @@ Page({
         }
       })
     })
-
     this.setData({
       shoppingList: shoppingList,
       totalPrice: total,
@@ -267,12 +329,13 @@ Page({
   decNumber: function (e) {
     // console.log(e)
     let id = e.target.dataset.id
-    console.log(id)
+    // console.log(id)
     let index = e.currentTarget.dataset.index;
     // console.log(index)
     let shoppingList = this.data.shoppingList;
 
     let total = parseFloat(this.data.totalPrice - shoppingList[index].price.toFixed(2));
+    total = +total.toFixed(2)
     shoppingList[index].total -= parseFloat(shoppingList[index].price.toFixed(2));
     shoppingList[index].total = parseFloat(shoppingList[index].total.toFixed(2))
     shoppingList[index].num == 1 ? shoppingList.splice(index, 1) : shoppingList[index].num--;
@@ -293,7 +356,7 @@ Page({
       })
     })
  
-    total = parseFloat(parseFloat(total).toFixed(2))
+    // total = parseFloat(parseFloat(total).toFixed(2))
     this.setData({
       shoppingList: shoppingList,
       totalPrice: total,
@@ -326,6 +389,229 @@ Page({
    */
   // 加载ajax的最佳时机
   onLoad: function (options) {
+    let json = {
+      "total": [
+        {
+          "categoryId": "753de7375c4d47338f60ee4fce948504",
+          "categoryName": "类目3",
+          "productlist": [
+            {
+              "id": "4538ebf3e9d64c08a5d337bd83bfd3b3",
+              "productName": "商品8",
+              "categoryId": "753de7375c4d47338f60ee4fce948504",
+              "productPrice": 3,
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/d280e7ad27be4e0ba0845e188946019d.jpg",
+              "createTime": "2018-05-21 14:38:30",
+              "updateTime": "2018-05-22 17:15:10",
+              "categoryName": "类目3"
+            },
+            {
+              "id": "5225b7d82b1e4561811de4856e707a5f",
+              "productName": "商品8",
+              "categoryId": "753de7375c4d47338f60ee4fce948504",
+              "productPrice": 5.9,
+              "productStock": "1",
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/d20805d898e246bfbabab6b0fb3a1cea.jpg",
+              "productSpec": "1",
+              "createTime": "2018-05-21 14:00:55",
+              "updateTime": "2018-05-22 17:15:21",
+              "categoryName": "类目3"
+            },
+            {
+              "id": "5acf23d0280b468bb01e524d7c9decf0",
+              "productName": "商品7",
+              "categoryId": "753de7375c4d47338f60ee4fce948504",
+              "productPrice": 9.8,
+              "productStock": "1",
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/5831932588dd4e6bb4725e73767b385f.jpg",
+              "createTime": "2018-05-21 14:00:37",
+              "updateTime": "2018-05-21 14:00:36",
+              "categoryName": "类目3"
+            },
+            {
+              "id": "612a7ae50e2347a28fddc27641074ead",
+              "productName": "商品6",
+              "categoryId": "753de7375c4d47338f60ee4fce948504",
+              "productPrice": 2.6,
+              "productStock": "1",
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/97737730fe374b53a56d9e7689154bc8.jpg",
+              "createTime": "2018-05-21 13:59:49",
+              "updateTime": "2018-05-21 13:59:49",
+              "categoryName": "类目3"
+            },
+            {
+              "id": "d8d0a61c7ecc4f04beb1351d5c9daae3",
+              "productName": "商品5",
+              "categoryId": "753de7375c4d47338f60ee4fce948504",
+              "productPrice": 3.2,
+              "productStock": "2",
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/83fab184dfb44ff7b9d773aa454f46cd.jpg",
+              "createTime": "2018-05-21 13:59:31",
+              "updateTime": "2018-05-21 13:59:31",
+              "categoryName": "类目3"
+            },
+            {
+              "id": "4f650bac6632458d92ec8f7050ac1886",
+              "productName": "商品4",
+              "categoryId": "753de7375c4d47338f60ee4fce948504",
+              "productPrice": 2.2,
+              "productStock": "1",
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/1588a5d3640048aeb56d07b7864eb8c1.jpg",
+              "createTime": "2018-05-21 13:59:09",
+              "updateTime": "2018-05-21 13:59:09",
+              "categoryName": "类目3"
+            },
+            {
+              "id": "1677e64377cc4ba681f4193f1d0c9169",
+              "productName": "商品3",
+              "categoryId": "753de7375c4d47338f60ee4fce948504",
+              "productPrice": 3.2,
+              "productStock": "1",
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/8fad0bf40a2446fb9900042a683e7966.jpg",
+              "createTime": "2018-05-21 13:58:50",
+              "updateTime": "2018-05-21 13:58:49",
+              "categoryName": "类目3"
+            },
+            {
+              "id": "1e289cfe07d0477e94a20a1676f35bbf",
+              "productName": "商品2",
+              "categoryId": "753de7375c4d47338f60ee4fce948504",
+              "productPrice": 1.4,
+              "productStock": "1",
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/dfcf75eac2114bd0b3afdec49de75bf1.jpg",
+              "createTime": "2018-05-21 13:58:30",
+              "updateTime": "2018-05-21 13:58:30",
+              "categoryName": "类目3"
+            },
+            {
+              "id": "5aa5084094e6411a9a8957975f57872b",
+              "productName": "商品1",
+              "categoryId": "753de7375c4d47338f60ee4fce948504",
+              "productPrice": 1.1,
+              "productStock": "3",
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/c290b96e2bbb4815a871273a7df19b65.jpg",
+              "createTime": "2018-05-21 13:58:06",
+              "updateTime": "2018-05-21 13:58:05",
+              "categoryName": "类目3"
+            }
+          ]
+        },
+        {
+          "categoryId": "52425c94b2df4d1fbf3443b6fb513ec0",
+          "categoryName": "图片",
+          "productlist": [
+            {
+              "id": "fa13852369644bc19012aad1d52b08c8",
+              "productName": "商品3",
+              "categoryId": "52425c94b2df4d1fbf3443b6fb513ec0",
+              "productPrice": 1,
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/2bec376e331844b1a2b0aa170416c6e4.jpg",
+              "createTime": "2018-05-21 14:36:11",
+              "updateTime": "2018-05-22 13:23:55",
+              "categoryName": "图片"
+            },
+            {
+              "id": "7948e80567d6496d979ace392d72be91",
+              "productName": "红烧鸡",
+              "categoryId": "52425c94b2df4d1fbf3443b6fb513ec0",
+              "productPrice": 3,
+              "productStock": "1",
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/2af7d74cc09f4ef78c8d6ddd50d7d261.jpg",
+              "createTime": "2018-05-21 14:35:04",
+              "updateTime": "2018-05-21 14:35:04",
+              "categoryName": "图片"
+            },
+            {
+              "id": "e688f7bb31214b13a280469065741a5f",
+              "productName": "商品6",
+              "categoryId": "52425c94b2df4d1fbf3443b6fb513ec0",
+              "productPrice": 4,
+              "productStock": "2",
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/4337509e4d5b44939b1f0a2b1b06106e.jpg",
+              "productSpec": "2",
+              "createTime": "2018-05-21 11:32:53",
+              "updateTime": "2018-05-21 13:47:07",
+              "categoryName": "图片"
+            },
+            {
+              "id": "1e2f3e772d80443cad1e0b6132982f6c",
+              "productName": "商品1",
+              "categoryId": "52425c94b2df4d1fbf3443b6fb513ec0",
+              "productPrice": 100,
+              "productStock": "2",
+              "productDes": "商品1",
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/bc565c530b1b4a01bc8dbc52792770d3.jpg",
+              "productSpec": "2",
+              "createTime": "2018-05-21 09:44:32",
+              "updateTime": "2018-05-21 11:01:41",
+              "categoryName": "图片"
+            }
+          ]
+        },
+        {
+          "categoryId": "ec75e480f0ee4051ba42e2b70dc4ce00",
+          "categoryName": "类目1",
+          "productlist": [
+            {
+              "id": "941177bc90f44c4cbb95fabbbc5b9287",
+              "productName": "商品7",
+              "categoryId": "ec75e480f0ee4051ba42e2b70dc4ce00",
+              "productPrice": 4,
+              "productStock": "3",
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/d9f892ebb5bc450ea6ca68ecf0fb4546.jpg",
+              "productSpec": "3",
+              "createTime": "2018-05-21 13:49:46",
+              "updateTime": "2018-05-21 13:50:18",
+              "categoryName": "类目1"
+            },
+            {
+              "id": "8c6b00aba1a74d288fe54caa70b53589",
+              "productName": "商品5",
+              "categoryId": "ec75e480f0ee4051ba42e2b70dc4ce00",
+              "productPrice": 0.01,
+              "productStock": "1",
+              "productSpec": "1",
+              "createTime": "2018-05-18 14:45:40",
+              "updateTime": "2018-05-22 13:24:57",
+              "categoryName": "类目1"
+            },
+            {
+              "id": "3241c73015e646f78abca557b476504c",
+              "productName": "商品3",
+              "categoryId": "ec75e480f0ee4051ba42e2b70dc4ce00",
+              "productPrice": 3,
+              "productStock": "2",
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/7d321e3611554ed887103b81ba7b66a4.jpg",
+              "productSpec": "2",
+              "createTime": "2018-05-18 14:42:04",
+              "updateTime": "2018-05-21 13:47:02",
+              "categoryName": "类目1"
+            },
+            {
+              "id": "00565eb575e2429884867482e43f308f",
+              "productName": "商品2",
+              "categoryId": "ec75e480f0ee4051ba42e2b70dc4ce00",
+              "productPrice": 2,
+              "productStock": "3",
+              "productSpec": "2",
+              "createTime": "2018-05-18 14:40:43",
+              "updateTime": "2018-05-22 13:32:17",
+              "categoryName": "类目1"
+            },
+            {
+              "id": "87a9a7dc0837463384ec0d209cd1b1de",
+              "productName": "商品4",
+              "categoryId": "ec75e480f0ee4051ba42e2b70dc4ce00",
+              "productPrice": 1,
+              "productIcon": "/dcback/file/7583efdcbf5c4309b39eaab541300989/e24f65fcf17e4cee9c804dabc08f9871.jpg",
+              "createTime": "2018-05-18 11:35:13",
+              "updateTime": "2018-05-21 10:00:45",
+              "categoryName": "类目1"
+            }
+          ]
+        }
+      ]
+    }
     console.log(options)
     let that = this,
         imgArray = this.data.imgArray
@@ -336,6 +622,12 @@ Page({
       mask: true
     })
 
+    // 购物车位置
+    this.busPos = {};
+    this.busPos['x'] = 35;
+    // this.busPos['x'] = app.globalData.ww / 2 - 10;
+    this.busPos['y'] = app.globalData.hh - 50;
+    console.log(this.busPos)
 
     // 商品列表
     wx.request({

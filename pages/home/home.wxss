@@ -7,7 +7,20 @@ view, scroll-view {
   box-sizing: border-box;
   padding: 0;
 }
-
+/*抛物线动画*/
+.good_box{
+  width: 40rpx;
+  height: 40rpx;
+  position: fixed;
+  border-radius: 50%;
+  overflow: hidden;
+  left: 50%;
+  top: 50%;
+  z-index: +99;
+  /* background:rgba(0,133,207,1); */
+   background: #FF9C35; 
+  /* background: #f55d54; */
+}
 .container {
   position: relative;
   display: flex;
@@ -88,10 +101,11 @@ view, scroll-view {
   display: inline-block;
   height: 100%;
   /* width: 50%; */
-  padding-left: 20rpx;
+  padding-left: 50rpx;
   vertical-align: middle;
 }
 .food-left {
+  padding-left: 0rpx;
 }
 .food-right {
   width: 280rpx;
@@ -370,8 +384,8 @@ view, scroll-view {
   color: #B1B1B1;
 }
 .activity-color{
-  /* color: #FF9C35; */
-  color: #f55d54;
+   color: #FF9C35; 
+  /* color: #f55d54; */
 }
 .icon-li-circle{
   margin-left: 30rpx;

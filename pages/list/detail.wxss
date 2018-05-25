@@ -18,7 +18,7 @@ view {
 }
 .items {
   width: 100%;
-  background-color: #fafafa;
+  background-color: #ccc;
 }
 .item {
   width: 100%;

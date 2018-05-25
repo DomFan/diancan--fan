@@ -16,7 +16,7 @@ view {
   height: 120rpx;
   line-height: 120rpx;
   padding: 0 20rpx;
-  background-color: #fafafa;
+  background-color: #ccc;
   /* border: 1rpx solid #f1f1f1; */
   border-radius: 4%;
   overflow: hidden;

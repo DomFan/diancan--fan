@@ -10,6 +10,8 @@
       </view>
     </view>
   </scroll-view>
+  <!-- 小球  -->
+  <view class="good_box" hidden="{{hide_good_box}}"  style="left: {{bus_x}}px; top: {{bus_y}}px;"></view>
   <!--scroll_into_view  值应为某子元素id（id不能以数字开头）。设置哪个方向可滚动，则在哪个方向滚动到该元素  -->
   <scroll-view class="main-page {{cartIsHidden ? '' : 'padding_bottom'}}" style="height:100%;" scroll-y="true" scroll-into-view="{{scroll_into_view}}" catchscroll="scroll">
     <view class="food-list" wx:for="{{foodArray}}" wx:for-item="item" wx:key='index' id="foodtype{{index}}">
